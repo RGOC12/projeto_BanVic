@@ -5,6 +5,7 @@ from pathlib import Path
 pasta = Path("src/data")
 
 class dados:
+    
     @st.cache_data
     def dados_transacoes():
         agencias_df = pd.read_csv(pasta/'agencias.csv')
@@ -49,6 +50,7 @@ class dados:
         propostas_df = pd.merge(propostas_df,agencias_df,on='cod_agencia', how='left')
         return propostas_df
     
+    @st.cache_data
     def cruzar_dados_com_desemprego():
         agencias_df = pd.read_csv(pasta / 'agencias.csv')
         transacoes_df = pd.read_csv(pasta / 'transacoes.csv')
@@ -72,6 +74,7 @@ class dados:
         capital_agencia_df.rename(columns={'data_abertura_y': 'data_abertura'}, inplace=True)
         return capital_agencia_df
     
+    @st.cache_data
     def dados_colaboradores():
         df_agencias = pd.read_csv(pasta / "agencias.csv")
         df_colaboradores = pd.read_csv(pasta / "colaboradores.csv")
@@ -81,3 +84,21 @@ class dados:
         df_completo = pd.merge(df_completo, df_colaborador_agencia, on='cod_colaborador', how='left')
         df_final = pd.merge(df_completo, df_agencias, on='cod_agencia', how='left')
         return df_final
+    
+    @st.cache_data
+    def dados_para_analise():
+        """
+        Carrega, converte e retorna todos os DataFrames de dados.
+        """
+        propostas_df = pd.read_csv(pasta / 'propostas_credito.csv')
+        contas_df = pd.read_csv(pasta / 'contas.csv')
+        transacoes_df = pd.read_csv(pasta / 'transacoes.csv')
+        clientes_df = pd.read_csv(pasta / 'clientes.csv')
+        
+        propostas_df['cod_cliente'] = propostas_df['cod_cliente'].astype(str)
+        contas_df['cod_cliente'] = contas_df['cod_cliente'].astype(str)
+        clientes_df['cod_cliente'] = clientes_df['cod_cliente'].astype(str)
+        transacoes_df['num_conta'] = transacoes_df['num_conta'].astype(str)
+        contas_df['num_conta'] = contas_df['num_conta'].astype(str)
+
+        return propostas_df, contas_df, transacoes_df, clientes_df
