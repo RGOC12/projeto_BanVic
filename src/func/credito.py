@@ -32,8 +32,6 @@ class PropostaCredito:
         propostas_df['aprovadas'] = propostas_df['status_proposta'].apply(lambda x: 1 if x == 'Aprovada' else 0)
         propostas_df['em_analise'] = propostas_df['status_proposta'].apply(lambda x: 1 if x == 'Em análise' else 0)
         propostas_df['validacao_documentos'] = propostas_df['status_proposta'].apply(lambda x: 1 if x == 'Validação documentos' else 0)
-
-        # Agrupa por agência e data, somando as contagens.
         df_agrupado = propostas_df.groupby(['nome', 'data_entrada_proposta']).agg(
             enviadas=('enviadas', 'sum'),
             aprovadas=('aprovadas', 'sum'),

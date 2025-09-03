@@ -1,6 +1,6 @@
 import streamlit as st
 import plotly.express as px
-from src.func import BalancoBanco as bb, Dados as dd
+from src.func import BalancoBanco as bb, dados as dd
 
 
 st.set_page_config(page_title="Banco VICTOR", layout="wide")

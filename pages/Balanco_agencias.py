@@ -1,6 +1,6 @@
 import pandas as pd
 import streamlit as st
-from src.func import BalancoBanco as bb, Dados as dd, filtros as ft, view as vw
+from src.func import BalancoBanco as bb, dados as dd, filtros as ft, view as vw
 import numpy as np
 import plotly.graph_objects as go
 

@@ -1,6 +1,6 @@
 import streamlit as st
 import plotly.express as px
-from src.func import PropostaCredito as pc, Dados as dd,filtros as ft
+from src.func import PropostaCredito as pc, dados as dd,filtros as ft
 
 dados_df = dd.dados_credito()
 df_filtrado_por_data = ft.filtrar_por_data_prop(dados_df)
