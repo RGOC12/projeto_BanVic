@@ -11,6 +11,7 @@ with tab1:
     status_credito = pc.propostas_status(df_filtrado_por_data).reset_index()
     data_dados_df = status_credito[['data_abertura','nome','enviadas','aprovadas','em_analise','validacao_documentos','total_propostas','taxa_aprovacao']]
     st.dataframe(data_dados_df, hide_index=True)
+    
 
 with tab2:
     status_credito = pc.propostas_status(df_filtrado_por_data).reset_index()
