@@ -76,3 +76,6 @@ else:
         )
         fig.update_layout(xaxis_title="Funcionário", yaxis_title="Nº de Propostas Aprovadas")
         st.plotly_chart(fig, use_container_width=True)
+
+
+        

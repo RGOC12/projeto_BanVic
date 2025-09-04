@@ -2,22 +2,8 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 from src.func import dados as dd, contas_bancarias as cb, filtros as ft
-
-# 1. Carregar todos os dados de forma eficiente
-propostas_df, contas_df, transacoes_df, clientes_df = dd.dados_para_analise()
-agencias_df = pd.read_csv("src/data/agencias.csv")
-colaborador_agencia_df = pd.read_csv("src/data/colaborador_agencia.csv")
-
-propostas_df['data_entrada_proposta'] = pd.to_datetime(propostas_df['data_entrada_proposta'], format='mixed', errors='coerce').dt.tz_localize(None)
-contas_df['data_abertura'] = pd.to_datetime(contas_df['data_abertura'], format='mixed', errors='coerce').dt.tz_localize(None)
-contas_df['data_ultimo_lancamento'] = pd.to_datetime(contas_df['data_ultimo_lancamento'], format='mixed', errors='coerce').dt.tz_localize(None)
-transacoes_df['data_transacao'] = pd.to_datetime(transacoes_df['data_transacao'], format='mixed', errors='coerce').dt.tz_localize(None)
-
-propostas_df = pd.merge(propostas_df, colaborador_agencia_df, on='cod_colaborador', how='left')
-propostas_df = pd.merge(propostas_df, agencias_df[['cod_agencia', 'nome']], on='cod_agencia', how='left')
-transacoes_df = pd.merge(transacoes_df, contas_df[['num_conta', 'cod_agencia']], on='num_conta', how='left')
-transacoes_df = pd.merge(transacoes_df, agencias_df[['cod_agencia', 'nome']], on='cod_agencia', how='left')
-
+# 1. Carregar todos os dados de forma eficiente (em cache)
+propostas_df, contas_df, transacoes_df, clientes_df, agencias_df = dd.processar_dados_principais()
 total_clientes = clientes_df.shape[0]
 
 # --- Seção de Filtros no Streamlit ---
@@ -33,7 +19,7 @@ if data_inicio > data_fim:
     data_inicio, data_fim = data_fim, data_inicio
 
 todas_agencias = agencias_df['nome'].unique()
-agencias_selecionadas = st.sidebar.multiselect(
+agencias_selecionadas = st.multiselect(
     'Selecione as Agências:',
     options=todas_agencias,
     default=todas_agencias
@@ -75,7 +61,6 @@ with grafico_tab:
     colunas_para_derreter = ['Aprovada', 'Rejeitada', 'Em Análise', 'Enviada', 'Validação documentos', 'Saque', 'Depósito']
     colunas_presentes = [col for col in colunas_para_derreter if col in df_analise_final.columns]
     
-    # ⚠️ Alteração: Agora usa a coluna 'nome_completo' no gráfico
     df_longo = pd.melt(df_analise_final, id_vars=['nome_completo'], value_vars=colunas_presentes, var_name='Tipo de Análise', value_name='Quantidade/Valor')
 
     fig = px.bar(

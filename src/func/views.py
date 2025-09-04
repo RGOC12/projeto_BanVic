@@ -53,11 +53,4 @@ class view:
         else:
             conclusao_estatistica = "A análise **REFUTA** a afirmação. A diferença observada no volume médio de transações entre os meses pares e ímpares **NÃO É** estatisticamente significativa."
 
-        st.markdown(f"""
-        **Análise Estatística:**
-        * **Teste t-Student:** `{t_stat:.2f}`
-        * **P-valor:** `{p_valor:.3f}`
-        
-        **Conclusão:**
-        {conclusao_estatistica}
-        """)
+        st.markdown(f"""Conclusão: {conclusao_estatistica}""")

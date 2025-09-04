@@ -4,17 +4,42 @@ class PropostaCredito:
     
     def propostas_status(propostas): 
         propostas_df = propostas.copy()
+
+        # Se o DataFrame estiver vazio, retorna ele mesmo sem erro
+        if propostas_df.empty:
+            return propostas_df
+
+        # Marca status em colunas auxiliares
         propostas_df['enviadas'] = propostas_df['status_proposta'].where(propostas_df['status_proposta'] == 'Enviada') 
         propostas_df['aprovada'] = propostas_df['status_proposta'].where(propostas_df['status_proposta'] == 'Aprovada') 
         propostas_df['em_analise'] = propostas_df['status_proposta'].where(propostas_df['status_proposta'] == 'Em análise') 
         propostas_df['validacao_documentos'] = propostas_df['status_proposta'].where(propostas_df['status_proposta'] == 'Validação documentos') 
-        propostas_df.loc[:,'taxa_aprovacao'] = 0
-        propostas_df.loc[:,'total_propostas'] = 0
-        propostas_df = propostas_df[['data_abertura','nome','enviadas','aprovada','em_analise','validacao_documentos','taxa_aprovacao','total_propostas']] 
-        propostas_df = propostas_df.groupby(['nome','data_abertura']).agg(enviadas = ('enviadas','count'),aprovadas=('aprovada','count'),em_analise = ('em_analise','count'),validacao_documentos=('validacao_documentos','count'))
-        propostas_df['total_propostas'] = (propostas_df['enviadas']+propostas_df['aprovadas']+propostas_df['em_analise']+ propostas_df['validacao_documentos'])
-        propostas_df['taxa_aprovacao'] = ((propostas_df['aprovadas']/(propostas_df['enviadas']+propostas_df['aprovadas']+propostas_df['em_analise']+ propostas_df['validacao_documentos'])) * 100).round(2).astype(str) + '%'
+
+        # Faz o agrupamento por nome e data
+        propostas_df = propostas_df.groupby(['nome','data_abertura']).agg(
+            enviadas=('enviadas','count'),
+            aprovadas=('aprovada','count'),
+            em_analise=('em_analise','count'),
+            validacao_documentos=('validacao_documentos','count')
+        )
+
+        # Calcula totais e taxa de aprovação
+        propostas_df['total_propostas'] = (
+            propostas_df['enviadas'] +
+            propostas_df['aprovadas'] +
+            propostas_df['em_analise'] +
+            propostas_df['validacao_documentos']
+        )
+
+        # Evita divisão por zero
+        propostas_df['taxa_aprovacao'] = 0
+        mask = propostas_df['total_propostas'] > 0
+        propostas_df.loc[mask, 'taxa_aprovacao'] = (
+            (propostas_df.loc[mask, 'aprovadas'] / propostas_df.loc[mask, 'total_propostas']) * 100
+        ).round(2).astype(str) + '%'
+
         return propostas_df
+
     
     def propostas_media(propostas):
         propostas_df = propostas.copy()

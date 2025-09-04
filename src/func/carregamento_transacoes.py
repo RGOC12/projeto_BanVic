@@ -20,7 +20,7 @@ class dados:
         # Mesclar os DataFrames principais
         capital_agencia_df = pd.merge(contas_df, transacoes_df, on='num_conta', how='left')
         capital_agencia_df = pd.merge(capital_agencia_df, agencias_df, on='cod_agencia', how='left')
-        
+        print(capital_agencia_df)
         # Converte a coluna de data para o formato correto
         capital_agencia_df['data_transacao'] = pd.to_datetime(capital_agencia_df['data_transacao'], format='mixed', utc=True)
         capital_agencia_df['data_transacao'] = capital_agencia_df['data_transacao'].dt.tz_localize(None)
@@ -85,15 +85,22 @@ class dados:
         df_final = pd.merge(df_completo, df_agencias, on='cod_agencia', how='left')
         return df_final
     
+
+
     @st.cache_data
-    def dados_para_analise():
-        """
-        Carrega, converte e retorna todos os DataFrames de dados.
-        """
+    def processar_dados_principais():
+      
         propostas_df = pd.read_csv(pasta / 'propostas_credito.csv')
         contas_df = pd.read_csv(pasta / 'contas.csv')
         transacoes_df = pd.read_csv(pasta / 'transacoes.csv')
         clientes_df = pd.read_csv(pasta / 'clientes.csv')
+        agencias_df = pd.read_csv(pasta / 'agencias.csv')
+        colaborador_agencia_df = pd.read_csv(pasta / 'colaborador_agencia.csv')
+
+        # Correção do tipo de dados e fusões
+        propostas_df['data_entrada_proposta'] = pd.to_datetime(propostas_df['data_entrada_proposta'], format='mixed', errors='coerce').dt.tz_localize(None)
+        contas_df['data_abertura'] = pd.to_datetime(contas_df['data_abertura'], format='mixed', errors='coerce').dt.tz_localize(None)
+        transacoes_df['data_transacao'] = pd.to_datetime(transacoes_df['data_transacao'], format='mixed', errors='coerce').dt.tz_localize(None)
         
         propostas_df['cod_cliente'] = propostas_df['cod_cliente'].astype(str)
         contas_df['cod_cliente'] = contas_df['cod_cliente'].astype(str)
@@ -101,4 +108,13 @@ class dados:
         transacoes_df['num_conta'] = transacoes_df['num_conta'].astype(str)
         contas_df['num_conta'] = contas_df['num_conta'].astype(str)
 
-        return propostas_df, contas_df, transacoes_df, clientes_df
+        propostas_df = pd.merge(propostas_df, colaborador_agencia_df, on='cod_colaborador', how='left')
+        propostas_df = pd.merge(propostas_df, agencias_df[['cod_agencia', 'nome']], on='cod_agencia', how='left')
+        transacoes_df = pd.merge(transacoes_df, contas_df[['num_conta', 'cod_agencia']], on='num_conta', how='left')
+        transacoes_df = pd.merge(transacoes_df, agencias_df[['cod_agencia', 'nome']], on='cod_agencia', how='left')
+
+        return propostas_df, contas_df, transacoes_df, clientes_df, agencias_df
+    
+    def dados_propostas():
+        pasta = Path("src/data")
+        return pd.read_csv(pasta / 'propostas_credito.csv')

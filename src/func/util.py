@@ -57,7 +57,18 @@ class filtros:
             (df[coluna_data] <= pd.to_datetime(data_fim))
         ]
         return df_filtrado
+    
     def filtrar_df_por_agencia(df, agencias_selecionadas):
        
         df_filtrado = df[df['nome'].isin(agencias_selecionadas)]
         return df_filtrado
+    
+    def filtrar_por_data_conclusao(df, data_inicio, data_fim, coluna_data="data_entrada_proposta"):
+        df_filtrado = df[
+                (df[coluna_data] >= pd.to_datetime(data_inicio)) &
+                (df[coluna_data] <= pd.to_datetime(data_fim))
+            ]
+        return df_filtrado
+    
+
+    
